@@ -51,7 +51,7 @@ const tasks = [
     //#region Events
     renderAllTasks(objOfTasks);
     form.addEventListener('submit', onFormSubmitHandler);
-
+    listContainer.addEventListener('click', onDeleteHandler);
     //#endregion
 
     function renderAllTasks(taskList) {
@@ -69,7 +69,12 @@ const tasks = [
 
     function listItemTemplate({ _id, title, body } = {}) {
         const li = document.createElement('li');
-        li.classList.add('list-group-item', 'd-flex', 'align-items-center', 'flex-wrap', 'mt-2')
+        li.classList.add('list-group-item',
+            'd-flex',
+            'align-items-center',
+            'flex-wrap',
+            'mt-2');
+        li.setAttribute('data-task-id', _id);
 
         const span = document.createElement('span');
         span.textContent = title;
@@ -114,6 +119,28 @@ const tasks = [
         objOfTasks[newTask._id] = newTask;
 
         return { ...newTask };
+    }
+
+    function deleteTask(id) {
+        const { title } = objOfTasks[id];
+        const isConfirm = confirm(`Are you sureyou want to delete: "${title}"?`)
+        if (!isConfirm) return isConfirm;
+        delete objOfTasks[id];
+        return isConfirm;
+    }
+
+    function deleteTaskFromHtml(confirmed, el) {
+        if (!confirmed) return;
+        el.remove();
+    }
+
+    function onDeleteHandler({ target }) {
+        if (target.classList.contains('delete-btn')) {
+            const parent = target.closest('[data-task-id]');
+            const id = parent.dataset.taskId;
+            const confirmed = deleteTask(id);
+            deleteTaskFromHtml(confirmed, parent)
+        }
     }
 
 })(tasks);
